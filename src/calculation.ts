@@ -7,7 +7,7 @@ interface eventDataProps {
 }
 
 self.onmessage = function (event: MessageEvent<eventDataProps>) {
-  let { rows, cols, grid, newGrid } = event.data;
+  let { rows, cols, grid, buildingPosition, newGrid } = event.data;
 
   self.postMessage(newGrid);
 };
