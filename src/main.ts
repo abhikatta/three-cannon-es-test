@@ -5,9 +5,15 @@ const calculator = new MyWorker();
 
 let grid: number[][] = [[]];
 const initialValue = 40;
-let hue = 0;
 
 const [rows, cols] = [initialValue, initialValue];
+
+const buildingPosition = {
+  x: Math.min(Math.ceil(Math.random() * initialValue), initialValue - 1),
+  y: Math.min(Math.ceil(Math.random() * initialValue), initialValue - 1),
+};
+
+console.log(buildingPosition);
 const app = document.getElementById("app");
 const canvas: HTMLCanvasElement = document.createElement("canvas");
 
@@ -29,15 +35,21 @@ const setupGrid = () => {
     const ctx = canvas.getContext("2d")!;
     const cellWidth = canvas.width / cols;
     const cellHeight = canvas.height / rows;
-    // dividing the grid on canvas and drawing the squares(cells) and filling them hue or black
+    // dividing the grid on canvas and drawing the squares(cells)
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
         ctx.roundRect(j * cellWidth, i * cellHeight, cellWidth, cellHeight);
-        ctx.fillStyle =
-          grid[i][j] === 0
-            ? "black"
-            : `hsl(${(grid[i][j] + 1) % 360}, 100%, 40%)`; // hot sand ig
+        ctx.fillStyle = "black";
         ctx.fillRect(j * cellWidth, i * cellHeight, cellWidth, cellHeight);
+
+        // ctx.strokeRect(j * cellWidth, i * cellHeight, cellWidth, cellHeight);
+        // ctx.strokeStyle = "white";
+
+        if (buildingPosition.x === i && buildingPosition.y === j) {
+          ctx.roundRect(j * cellHeight, i * cellWidth, cellWidth, cellHeight);
+          ctx.fillStyle = "red";
+          ctx.fillRect(j * cellHeight, i * cellWidth, cellWidth, cellHeight);
+        }
       }
     }
   }
@@ -45,46 +57,10 @@ const setupGrid = () => {
 
 setupGrid();
 
-canvas.addEventListener("mousemove", (e) => {
-  const canvasBounds = canvas.getBoundingClientRect();
-  const canvasX = canvasBounds.x;
-  const canvasY = canvasBounds.y;
-
-  const mouseX = e.clientX - canvasX;
-  const mouseY = e.clientY - canvasY;
-  // calc coordinates of the cell where the mouse is hovered on the canvas
-  const x = Math.floor((mouseX * initialValue) / canvas.width);
-  const y = Math.floor((mouseY * initialValue) / canvas.height);
-  //   if the cell is well inside the canvas boundaries, work on filling the cell
-  if (x >= 0 && x <= initialValue - 1 && y >= 0 && y <= initialValue - 1) {
-    grid[y][x] = 1;
-    setupGrid();
-  }
-});
-
-canvas.addEventListener("touchmove", (e) => {
-  const canvasBounds = canvas.getBoundingClientRect();
-  const canvasX = canvasBounds.x;
-  const canvasY = canvasBounds.y;
-  const touches = e.touches;
-
-  for (let i = 0; i < touches.length; i++) {
-    const mouseX = touches[i].clientX - canvasX;
-    const mouseY = touches[i].clientY - canvasY;
-
-    const x = Math.floor((mouseX * initialValue) / canvas.width);
-    const y = Math.floor((mouseY * initialValue) / canvas.height);
-    if (x >= 0 && x <= initialValue - 1 && y >= 0 && y <= initialValue - 1) {
-      grid[y][x] = 1;
-      setupGrid();
-    }
-  }
-});
-
 app?.append(canvas);
 
 const updateGrid = () => {
-  calculator.postMessage({ rows, cols, grid, newGrid, hue });
+  calculator.postMessage({ rows, cols, grid, newGrid });
   calculator.onmessage = function (e) {
     grid = e.data;
     setupGrid();
