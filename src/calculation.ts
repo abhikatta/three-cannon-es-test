@@ -1,13 +1,24 @@
-interface eventDataProps {
-  rows: number;
-  cols: number;
-  grid: number[][];
-  newGrid: number[][];
-  buildingPosition: { x: number; y: number };
+import { GRID_DIM, POSITION_MODIFIERS } from "./utils/constants";
+import { getPatrolPosition } from "./utils/get-position";
+import { getAbsNum } from "./utils/math-rounders";
+
+interface EventDataProps {
+  buildingPosition: {
+    x: number;
+    y: number;
+  };
 }
 
-self.onmessage = function (event: MessageEvent<eventDataProps>) {
-  let { rows, cols, grid, buildingPosition, newGrid } = event.data;
+self.onmessage = function (event: MessageEvent<EventDataProps>) {
+  const { buildingPosition } = event.data;
+  const PATROL_RADIUS = Math.max(getAbsNum("ceil", 7), 4);
 
-  self.postMessage(newGrid);
+  const { x: patrolPositionX, y: patrolPositionY } = getPatrolPosition(
+    PATROL_RADIUS,
+    POSITION_MODIFIERS,
+    GRID_DIM,
+    buildingPosition
+  );
+
+  self.postMessage({ patrolPositionX, patrolPositionY });
 };
