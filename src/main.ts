@@ -30,9 +30,14 @@ const drawBuilding = () => {
 
 app?.append(canvas);
 
-calculator.onmessage = function (e) {
-  patrolX = e.data.patrolPositionX;
-  patrolY = e.data.patrolPositionY;
+interface WorkerResponse {
+  x: number;
+  y: number;
+}
+
+calculator.onmessage = function (e: MessageEvent<WorkerResponse>) {
+  patrolX = e.data.x;
+  patrolY = e.data.y;
 };
 
 const update = () => {
