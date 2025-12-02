@@ -1,67 +1,67 @@
-import "./style.css";
-// '?worker' tells Vite to treat the imported file as a Web Worker
-import MyWorker from "./calculation.ts?worker";
-import { GRID_DIM } from "./utils/constants";
-import { getBuildingPosition } from "./utils/get-position";
-const calculator = new MyWorker();
+import {
+  AmbientLight,
+  GridHelper,
+  Mesh,
+  MeshStandardMaterial,
+  PointLight,
+  PointLightHelper,
+  TorusGeometry,
+} from "three";
+import { PerspectiveCamera, Scene, WebGLRenderer } from "three";
+import { OrbitControls } from "three/examples/jsm/Addons.js";
+import { saveSceneState } from "three/src/renderers/common/RendererUtils.js";
 
-const [rows, cols] = [GRID_DIM, GRID_DIM];
+const scene = new Scene();
+const camera = new PerspectiveCamera(
+  75,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  1000
+);
 
-const app = document.getElementById("app");
-export const canvas: HTMLCanvasElement = document.createElement("canvas");
+camera.position.set(0, 0, 30);
+const element = document.getElementById("bg");
 
-canvas.width = rows * 10;
-canvas.height = cols * 10;
-const cellWidth = canvas.width / cols;
-const cellHeight = canvas.height / rows;
+const renderer = new WebGLRenderer({
+  canvas: element!,
+});
 
-const { x, y } = getBuildingPosition(GRID_DIM);
-let patrolX: number | null = null;
-let patrolY: number | null = null;
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setSize(window.innerWidth, window.innerHeight);
 
-const drawBuilding = () => {
-  const ctx = canvas.getContext("2d")!;
-  if (ctx) {
-    ctx.roundRect(x * cellHeight, y * cellWidth, cellWidth, cellHeight);
-    ctx.fillStyle = "red";
-    ctx.fillRect(x * cellHeight, y * cellWidth, cellWidth * 3, cellHeight * 3);
-  }
-};
+const geometry = new TorusGeometry(10, 3, 100, 100);
+const material = new MeshStandardMaterial({
+  color: 0xff6347,
+});
 
-app?.append(canvas);
+const torus = new Mesh(geometry, material);
 
-interface WorkerResponse {
-  x: number;
-  y: number;
+scene.add(torus);
+
+const pointLight = new PointLight(0xffffff);
+pointLight.intensity = 1000;
+
+const ambientLight = new AmbientLight(0xffffff);
+
+const pointLightHelper = new PointLightHelper(pointLight);
+
+scene.add(pointLightHelper);
+
+scene.add(pointLight, ambientLight);
+pointLight.position.set(15, 2, 0);
+
+const gridHelper = new GridHelper(200, 50);
+const orbitalControls = new OrbitControls(camera, renderer.domElement);
+
+scene.add(gridHelper);
+function animate() {
+  renderer.render(scene, camera);
+
+  orbitalControls.update();
+  torus.rotation.x += 0.01;
+  torus.rotation.y += 0.03;
+  torus.rotation.z += 0.045;
+  requestAnimationFrame(animate);
 }
 
-calculator.onmessage = function (e: MessageEvent<WorkerResponse>) {
-  patrolX = e.data.x;
-  patrolY = e.data.y;
-};
-
-const update = () => {
-  const ctx = canvas.getContext("2d")!;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  drawBuilding();
-
-  if (patrolX !== null && patrolY !== null) {
-    ctx.fillStyle = "green";
-    ctx.fillRect(
-      patrolX * cellHeight,
-      patrolY * cellWidth,
-      cellWidth,
-      cellHeight
-    );
-  }
-
-  calculator.postMessage({
-    buildingPosition: { x, y },
-  });
-
-  requestAnimationFrame(update);
-};
-
-// start animation
-requestAnimationFrame(update);
+requestAnimationFrame(animate);

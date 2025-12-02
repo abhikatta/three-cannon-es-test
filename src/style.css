@@ -1,31 +1,9 @@
-body {
-  margin: 0;
-  padding: 0;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background-color: black;
-  color: rgba(255, 255, 255, 0.87);
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
+@import "tailwindcss";
 
 canvas {
-  border: 0.2px solid white;
-  cursor: grab;
-}
-
-footer {
-  position: absolute;
-  bottom: 10px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
   width: 100vw;
-}
-
-.footer-link {
-  width: 100%;
-  text-align: center;
-  display: inline-block;
-  color: whitesmoke;
 }
