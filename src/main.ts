@@ -1,12 +1,15 @@
 import {
   AmbientLight,
   GridHelper,
+  MathUtils,
   Mesh,
+  MeshBasicMaterial,
   MeshStandardMaterial,
   PerspectiveCamera,
   PointLight,
   PointLightHelper,
   Scene,
+  SphereGeometry,
   TorusGeometry,
   WebGLRenderer,
 } from "three";
@@ -52,6 +55,22 @@ const orbitalControls = new OrbitControls(camera, renderer.domElement); // not r
 const gridHelper = new GridHelper(200, 50);
 
 scene.add(gridHelper);
+
+const addStar = () => {
+  const starGeometry = new SphereGeometry(0.25, 3, 3, 0);
+  const starMaterial = new MeshBasicMaterial();
+  const star = new Mesh(starGeometry, starMaterial);
+
+  const [x, y, z] = Array(3)
+    .fill(0)
+    .map(() => MathUtils.randFloatSpread(500));
+
+  star.position.set(x, y, z);
+
+  scene.add(star);
+};
+
+Array(1000).fill(0).forEach(addStar);
 
 // 5. animation loop
 function animate() {
