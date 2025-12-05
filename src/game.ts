@@ -67,7 +67,7 @@ export default class Game {
   start() {
     this.renderer.setAnimationLoop(() => {
       this.renderer.render(this.scene, this.player.camera);
-      this.world.step(1 / 60);
+      this.world.step(1 / 120);
       this.player.move();
       this.player.update();
     });
