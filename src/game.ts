@@ -1,27 +1,21 @@
 import { OrbitControls } from "three/examples/jsm/Addons.js";
-import InputManager from "./core/input-manager";
 import RenderManager from "./core/render-manager";
 import SceneManager from "./core/scene-manager";
 import Ground from "./entities/ground";
-import Star from "./entities/star";
 import Player from "./entities/player";
+import Star from "./entities/star";
 
 export default class Game {
   renderer;
   scene;
-  camera;
   world;
   orbitalControls;
-  playerMesh;
-  playerBody;
+  player;
 
   constructor() {
     const { scene, world } = new SceneManager();
     this.scene = scene;
     this.world = world;
-
-    const { camera } = new InputManager();
-    this.camera = camera;
 
     const { renderer } = new RenderManager();
     this.renderer = renderer;
@@ -31,11 +25,6 @@ export default class Game {
     this.scene.add(groundMesh);
     this.world.addBody(groundBody);
 
-    this.orbitalControls = new OrbitControls(
-      this.camera,
-      this.renderer.domElement
-    );
-
     Array(1000)
       .fill(0)
       .forEach(() => {
@@ -43,11 +32,17 @@ export default class Game {
         this.scene.add(star);
       });
 
-    const { playerBody, playerMesh } = new Player();
-    this.playerMesh = playerMesh;
-    this.playerBody = playerBody;
-    this.scene.add(playerMesh);
-    this.world.addBody(playerBody);
+    const player = new Player();
+    this.player = player;
+    this.scene.add(this.player.camera);
+
+    this.orbitalControls = new OrbitControls(
+      this.player.camera,
+      this.renderer.domElement
+    );
+
+    this.scene.add(player.playerMesh);
+    this.world.addBody(player.playerBody);
   }
 
   /*
@@ -78,11 +73,10 @@ export default class Game {
 
   start() {
     this.renderer.setAnimationLoop(() => {
-      this.renderer.render(this.scene, this.camera);
+      this.renderer.render(this.scene, this.player.camera);
       this.world.step(1 / 60);
-      this.playerMesh.position.copy(this.playerBody.position);
-      this.playerMesh.quaternion.copy(this.playerBody.quaternion);
-
+      this.player.move();
+      this.player.update();
       this.orbitalControls.update();
     });
   }

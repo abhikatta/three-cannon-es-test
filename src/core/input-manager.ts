@@ -1,15 +1,14 @@
-import { PerspectiveCamera } from "three";
-
-// TODO
 export default class InputManager {
-  camera;
+  keys: {
+    [key: KeyboardEvent["code"]]: boolean;
+  };
+
   constructor() {
-    this.camera = new PerspectiveCamera(
-      60,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      500
-    );
-    this.camera.position.set(0, 40, 50);
+    this.keys = {};
+    window.addEventListener("keydown", (e) => (this.keys[e.code] = true));
+    window.addEventListener("keyup", (e) => (this.keys[e.code] = false));
+  }
+  isDown(code: KeyboardEvent["code"]) {
+    return this.keys[code];
   }
 }
