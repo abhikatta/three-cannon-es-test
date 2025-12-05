@@ -9,8 +9,8 @@ export default class Star {
 
     const [x, y, z] = Array(3)
       .fill(0)
-      .map(() => MathUtils.randFloatSpread(500));
+      .map(() => MathUtils.randFloatSpread(1000));
 
-    this.star.position.set(x, y, z);
+    this.star.position.set(x, y + 500, z);
   }
 }

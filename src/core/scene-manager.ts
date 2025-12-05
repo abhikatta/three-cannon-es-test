@@ -9,6 +9,7 @@ export default class SceneManager {
     this.scene.add(new AmbientLight());
     this.world = new World({
       gravity: new Vec3(0, -9.81, 0),
+      frictionGravity: new Vec3(0, 0.5, 0),
     });
   }
 }

@@ -16,8 +16,7 @@ export default class Player {
     this.camera = new PerspectiveCamera(
       60,
       window.innerWidth / window.innerHeight,
-      0.1,
-      500
+      0.1
     );
     const playerGeometry = new BoxGeometry(2, 5, 2);
     const playerMaterial = new MeshStandardMaterial({ color: "white" });
@@ -28,9 +27,14 @@ export default class Player {
       position: new Vec3(0, 10, 0),
       type: Body.DYNAMIC,
       material: new Material(),
-      mass: 100,
+      mass: 1,
     });
-    this.camera.position.set(0, 20, 30);
+    this.camera.position.copy(this.playerMesh.position);
+    this.camera.lookAt(
+      this.playerMesh.position.x,
+      this.playerMesh.position.y,
+      this.playerMesh.position.z - 1
+    );
 
     this.InputManager = new InputManager();
     this.playerMesh.position.copy(this.playerBody.position);
@@ -43,7 +47,7 @@ export default class Player {
   }
 
   move() {
-    const speed = 8;
+    const speed = 50;
     const force = new Vec3(0, 0, 0);
 
     if (this.InputManager.isDown("KeyW")) force.z -= speed;
@@ -52,9 +56,17 @@ export default class Player {
     if (this.InputManager.isDown("KeyD")) force.x += speed;
     if (this.InputManager.isDown("Space")) force.y += speed;
 
-    this.playerBody.velocity.x = force.x;
-    this.playerBody.velocity.z = force.z;
+    this.playerBody.applyForce(force, this.playerBody.position);
+
+    this.playerBody.fixedRotation = true;
+    this.playerBody.updateMassProperties();
 
     this.playerMesh.position.copy(this.playerBody.position);
+    this.camera.position.copy(this.playerMesh.position);
+    this.camera.lookAt(
+      this.playerMesh.position.x,
+      this.playerMesh.position.y,
+      this.playerMesh.position.z - 1
+    );
   }
 }

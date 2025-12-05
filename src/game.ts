@@ -1,4 +1,3 @@
-import { OrbitControls } from "three/examples/jsm/Addons.js";
 import RenderManager from "./core/render-manager";
 import SceneManager from "./core/scene-manager";
 import Ground from "./entities/ground";
@@ -9,7 +8,6 @@ export default class Game {
   renderer;
   scene;
   world;
-  orbitalControls;
   player;
 
   constructor() {
@@ -25,7 +23,7 @@ export default class Game {
     this.scene.add(groundMesh);
     this.world.addBody(groundBody);
 
-    Array(1000)
+    Array(10000)
       .fill(0)
       .forEach(() => {
         const { star } = new Star();
@@ -35,11 +33,6 @@ export default class Game {
     const player = new Player();
     this.player = player;
     this.scene.add(this.player.camera);
-
-    this.orbitalControls = new OrbitControls(
-      this.player.camera,
-      this.renderer.domElement
-    );
 
     this.scene.add(player.playerMesh);
     this.world.addBody(player.playerBody);
@@ -77,7 +70,6 @@ export default class Game {
       this.world.step(1 / 60);
       this.player.move();
       this.player.update();
-      this.orbitalControls.update();
     });
   }
 }

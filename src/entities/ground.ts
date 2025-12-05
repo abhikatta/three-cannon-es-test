@@ -5,12 +5,12 @@ export default class Ground {
   groundMesh;
   groundBody;
   constructor() {
-    const groundGeometry = new BoxGeometry(200, 200, 0.5);
+    const groundGeometry = new BoxGeometry(1000, 1000, 0.5);
     const groundMaterial = new MeshStandardMaterial({ color: "teal" });
     this.groundMesh = new Mesh(groundGeometry, groundMaterial);
 
     this.groundBody = new Body({
-      shape: new Box(new Vec3(100, 100, 0.25)),
+      shape: new Box(new Vec3(500, 500, 0.25)),
       type: Body.STATIC,
       material: new Material(),
     });
