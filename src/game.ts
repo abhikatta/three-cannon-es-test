@@ -1,16 +1,20 @@
+import { PerspectiveCamera } from "three";
+import { OrbitControls } from "three/examples/jsm/Addons.js";
 import RenderManager from "./core/render-manager";
 import SceneManager from "./core/scene-manager";
 import Ground from "./entities/ground";
 import Player from "./entities/player";
-import Star from "./entities/star";
+import StarField from "./entities/star-field";
 
 export default class Game {
   renderer;
   scene;
   world;
   player;
-
-  constructor() {
+  orbitalCamera: PerspectiveCamera | null = null;
+  orbitalControls: OrbitControls | null = null;
+  enableOrbitalControls;
+  constructor(enableOrbitalControls: boolean) {
     const { scene, world } = new SceneManager();
     this.scene = scene;
     this.world = world;
@@ -23,12 +27,8 @@ export default class Game {
     this.scene.add(groundMesh);
     this.world.addBody(groundBody);
 
-    Array(10000)
-      .fill(0)
-      .forEach(() => {
-        const { star } = new Star();
-        this.scene.add(star);
-      });
+    const { stars } = new StarField(10000);
+    this.scene.add(stars);
 
     const player = new Player();
     this.player = player;
@@ -36,6 +36,10 @@ export default class Game {
 
     this.scene.add(player.playerMesh);
     this.world.addBody(player.playerBody);
+    this.enableOrbitalControls = enableOrbitalControls;
+    if (this.enableOrbitalControls) {
+      this.addOrbitalCamera();
+    }
   }
 
   /*
@@ -64,10 +68,33 @@ export default class Game {
     - The animation loop keeps the correct context and everything updates.
 */
 
+  addOrbitalCamera() {
+    this.orbitalCamera = new PerspectiveCamera(
+      60,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      999999999999999
+    );
+    this.orbitalCamera.position.set(0, 30, 50);
+    this.orbitalControls = new OrbitControls(
+      this.orbitalCamera,
+      this.renderer.domElement
+    );
+
+    this.scene.add(this.orbitalCamera);
+  }
+
   start() {
     this.renderer.setAnimationLoop(() => {
-      this.renderer.render(this.scene, this.player.camera);
+      this.renderer.render(
+        this.scene,
+        this.enableOrbitalControls && this.orbitalCamera
+          ? this.orbitalCamera
+          : this.player.camera
+      );
       this.world.step(1 / 120);
+      // for orbital controls:
+      if (this.enableOrbitalControls) this.orbitalControls?.update(1 / 120);
       this.player.move();
       this.player.update();
     });

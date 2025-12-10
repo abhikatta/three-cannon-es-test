@@ -58,8 +58,8 @@ export default class Player {
 
     // TODO: add a state that if player is on ground then dont apply this state
     // only apply this force when player is flying
-    if (!this.InputManager.isDown("Space"))
-      this.playerBody.applyForce(new Vec3(0, -200, 0));
+    // if (!this.InputManager.isDown("Space"))
+    //   this.playerBody.applyForce(new Vec3(0, -200, 0));
 
     this.playerBody.applyForce(force, this.playerBody.position);
 
