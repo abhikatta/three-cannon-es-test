@@ -1,34 +1,35 @@
-import { Body, Box, Material, Vec3 } from "cannon-es";
-import {
-  BoxGeometry,
-  Mesh,
-  MeshStandardMaterial,
-  PerspectiveCamera,
-} from "three";
+import { Body, Material, Sphere, Vec3 } from "cannon-es";
+import { Box3, Object3D, PerspectiveCamera, Vector3 } from "three";
 import InputManager from "../core/input-manager";
 
 export default class Player {
   playerMesh;
   playerBody;
   camera;
-  InputManager;
-  constructor() {
+  InputManager!: InputManager;
+
+  constructor(player3dModel: Object3D) {
+    this.playerMesh = player3dModel;
+
+    const box = new Box3().setFromObject(this.playerMesh);
+    const size = new Vector3();
+    box.getSize(size);
+
+    const radius = Math.max(size.x, size.y, size.z) / 2;
+
+    this.playerBody = new Body({
+      shape: new Sphere(radius),
+      position: new Vec3(0, 10, 0),
+      mass: 1,
+      material: new Material(),
+    });
+
     this.camera = new PerspectiveCamera(
       60,
       window.innerWidth / window.innerHeight,
       0.1
     );
-    const playerGeometry = new BoxGeometry(2, 5, 2);
-    const playerMaterial = new MeshStandardMaterial({ color: "white" });
-    this.playerMesh = new Mesh(playerGeometry, playerMaterial);
 
-    this.playerBody = new Body({
-      shape: new Box(new Vec3(1, 2.5, 1)),
-      position: new Vec3(0, 10, 0),
-      type: Body.DYNAMIC,
-      material: new Material(),
-      mass: 1,
-    });
     this.camera.position.copy(this.playerMesh.position);
     this.camera.lookAt(
       this.playerMesh.position.x,
@@ -37,8 +38,7 @@ export default class Player {
     );
 
     this.InputManager = new InputManager();
-    this.playerMesh.position.copy(this.playerBody.position);
-    this.playerMesh.quaternion.copy(this.playerBody.quaternion);
+    this.update();
   }
 
   update() {

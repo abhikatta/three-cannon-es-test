@@ -1,19 +1,20 @@
-import { PerspectiveCamera } from "three";
-import { OrbitControls } from "three/examples/jsm/Addons.js";
-import RenderManager from "./core/render-manager";
-import SceneManager from "./core/scene-manager";
-import Ground from "./entities/ground";
-import Player from "./entities/player";
-import StarField from "./entities/star-field";
+import RenderManager from "@/core/render-manager";
+import SceneManager from "@/core/scene-manager";
+import Ground from "@/entities/ground";
+import Player from "@/entities/player";
+import StarField from "@/entities/star-field";
+import { Object3D, PerspectiveCamera } from "three";
+import { GLTFLoader, OrbitControls } from "three/examples/jsm/Addons.js";
 
 export default class Game {
   renderer;
   scene;
   world;
-  player;
+  player!: Player;
   orbitalCamera: PerspectiveCamera | null = null;
   orbitalControls: OrbitControls | null = null;
   enableOrbitalControls;
+  player3dModel!: Object3D;
   constructor(enableOrbitalControls: boolean) {
     const { scene, world } = new SceneManager();
     this.scene = scene;
@@ -29,17 +30,24 @@ export default class Game {
 
     const { stars } = new StarField(10000);
     this.scene.add(stars);
-
-    const player = new Player();
-    this.player = player;
-    this.scene.add(this.player.camera);
-
-    this.scene.add(player.playerMesh);
-    this.world.addBody(player.playerBody);
     this.enableOrbitalControls = enableOrbitalControls;
+    this.init();
     if (this.enableOrbitalControls) {
       this.addOrbitalCamera();
     }
+  }
+  async init() {
+    const loader = new GLTFLoader();
+    const gltf = await loader.loadAsync("/models/sphere.glb");
+    gltf.scene.scale.set(1, 1, 1);
+    this.player3dModel = gltf.scene;
+
+    const player = new Player(this.player3dModel);
+    this.player = player;
+
+    this.scene.add(player.playerMesh);
+    this.scene.add(player.camera);
+    this.world.addBody(player.playerBody);
   }
 
   /*
@@ -95,8 +103,10 @@ export default class Game {
       this.world.step(1 / 120);
       // for orbital controls:
       if (this.enableOrbitalControls) this.orbitalControls?.update(1 / 120);
-      this.player.move();
-      this.player.update();
+      if (this.player) {
+        this.player.move();
+        this.player.update();
+      }
     });
   }
 }
