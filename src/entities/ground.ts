@@ -6,7 +6,7 @@ export default class Ground {
   groundBody;
   constructor() {
     const groundGeometry = new BoxGeometry(1000, 1000, 0.5);
-    const groundMaterial = new MeshStandardMaterial({ color: "teal" });
+    const groundMaterial = new MeshStandardMaterial({ color: "#a46312" });
     this.groundMesh = new Mesh(groundGeometry, groundMaterial);
 
     this.groundBody = new Body({

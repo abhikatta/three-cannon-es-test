@@ -7,7 +7,6 @@ export default class Player {
   playerBody;
   camera;
   InputManager!: InputManager;
-
   constructor(player3dModel: Object3D) {
     this.playerMesh = player3dModel;
 
@@ -19,22 +18,16 @@ export default class Player {
 
     this.playerBody = new Body({
       shape: new Sphere(radius),
-      position: new Vec3(0, 10, 0),
+      position: new Vec3(0, radius + 10, 0),
       mass: 1,
       material: new Material(),
     });
 
     this.camera = new PerspectiveCamera(
-      60,
+      75,
       window.innerWidth / window.innerHeight,
-      0.1
-    );
-
-    this.camera.position.copy(this.playerMesh.position);
-    this.camera.lookAt(
-      this.playerMesh.position.x,
-      this.playerMesh.position.y,
-      this.playerMesh.position.z - 1
+      0.1,
+      1000
     );
 
     this.InputManager = new InputManager();
@@ -44,10 +37,23 @@ export default class Player {
   update() {
     this.playerMesh.position.copy(this.playerBody.position);
     this.playerMesh.quaternion.copy(this.playerBody.quaternion);
+
+    this.camera.lookAt(
+      this.playerMesh.position.x + 1,
+      this.playerMesh.position.y,
+      this.playerMesh.position.z
+    );
+    this.camera.position.copy(
+      new Vec3(
+        this.playerMesh.position.x - 3,
+        this.playerMesh.position.y + 2,
+        this.playerMesh.position.z
+      )
+    );
   }
 
   move() {
-    const speed = 50;
+    const speed = 12;
     const force = new Vec3(0, 0, 0);
 
     if (this.InputManager.isDown("KeyW")) force.z -= speed;
@@ -61,17 +67,13 @@ export default class Player {
     // if (!this.InputManager.isDown("Space"))
     //   this.playerBody.applyForce(new Vec3(0, -200, 0));
 
-    this.playerBody.applyForce(force, this.playerBody.position);
+    this.playerBody.torque.vadd(force, this.playerBody.torque);
+    this.playerBody.angularFactor.set(1, 1, 1);
+    this.playerBody.angularDamping = 0.5;
+    this.playerBody.linearDamping = 0.2;
 
-    this.playerBody.fixedRotation = true;
     this.playerBody.updateMassProperties();
 
-    this.playerMesh.position.copy(this.playerBody.position);
-    this.camera.position.copy(this.playerMesh.position);
-    this.camera.lookAt(
-      this.playerMesh.position.x,
-      this.playerMesh.position.y,
-      this.playerMesh.position.z - 1
-    );
+    this.update();
   }
 }
