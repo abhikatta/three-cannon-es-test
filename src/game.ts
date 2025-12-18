@@ -1,7 +1,7 @@
 import RenderManager from "@/core/render-manager";
 import SceneManager from "@/core/scene-manager";
 import Ground from "@/entities/ground";
-import Player from "@/entities/player";
+import Player from "@/entities/boulder-player";
 import StarField from "@/entities/star-field";
 import { Object3D, PerspectiveCamera } from "three";
 import { GLTFLoader, OrbitControls } from "three/examples/jsm/Addons.js";
@@ -15,6 +15,7 @@ export default class Game {
   orbitalControls: OrbitControls | null = null;
   player3dModel!: Object3D;
   ground3dModel!: Object3D;
+  loader;
   constructor() {
     const { scene, world } = new SceneManager();
     this.scene = scene;
@@ -25,12 +26,15 @@ export default class Game {
 
     const { stars } = new StarField(10000);
     this.scene.add(stars);
-    this.init();
+    this.loader = new GLTFLoader();
+    this.initBoulder();
+    this.initGrond();
   }
 
-  async init() {
-    const loader = new GLTFLoader();
-    const playerModel = await loader.loadAsync("/models/free_stone_sphere.glb");
+  async initBoulder() {
+    const playerModel = await this.loader.loadAsync(
+      "/models/free_stone_sphere.glb"
+    );
     this.player3dModel = playerModel.scene;
     this.player3dModel.scale.set(1, 1, 1);
     const player = new Player(this.player3dModel);
@@ -38,8 +42,10 @@ export default class Game {
     this.scene.add(player.playerMesh);
     this.scene.add(player.camera);
     this.world.addBody(player.playerBody);
+  }
 
-    const groundModel = await loader.loadAsync("/models/stone_ground.glb");
+  async initGrond() {
+    const groundModel = await this.loader.loadAsync("/models/stone_ground.glb");
     this.ground3dModel = groundModel.scene;
 
     new Ground(this.ground3dModel, this.scene, this.world);
@@ -76,7 +82,6 @@ export default class Game {
       if (this.player) {
         this.renderer.render(this.scene, this.player.camera);
         this.world.step(1 / 120);
-        // for orbital controls:
         this.player.move();
         this.player.update();
       }
