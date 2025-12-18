@@ -59,7 +59,7 @@ export default class Player {
   }
 
   move() {
-    const speed = 12;
+    const speed = 30;
     const force = new Vec3(0, 0, 0);
 
     if (this.InputManager.isDown("KeyW")) force.z -= speed;

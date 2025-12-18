@@ -42,10 +42,7 @@ export default class Game {
     const groundModel = await loader.loadAsync("/models/stone_ground.glb");
     this.ground3dModel = groundModel.scene;
 
-    const { groundBody, groundMesh } = new Ground(this.ground3dModel);
-
-    this.scene.add(groundMesh);
-    this.world.addBody(groundBody);
+    new Ground(this.ground3dModel, this.scene, this.world);
   }
 
   /*
