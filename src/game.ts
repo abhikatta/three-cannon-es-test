@@ -1,22 +1,25 @@
 import RenderManager from "@/core/render-manager";
 import SceneManager from "@/core/scene-manager";
 import Ground from "@/entities/ground";
-import Player from "@/entities/boulder-player";
 import StarField from "@/entities/star-field";
 import { Object3D, PerspectiveCamera } from "three";
 import { GLTFLoader, OrbitControls } from "three/examples/jsm/Addons.js";
-
+import BoulderPlayer from "@/entities/boulder-player";
+import { PlayerBase } from "./entities/player-base";
+import { Car } from "./entities/car-player";
+// import CannonDebugger from "cannon-es-debugger";
 export default class Game {
   renderer;
   scene;
   world;
-  player!: Player;
+  player!: PlayerBase;
   orbitalCamera: PerspectiveCamera | null = null;
   orbitalControls: OrbitControls | null = null;
   player3dModel!: Object3D;
   ground3dModel!: Object3D;
   loader;
-  constructor() {
+  //   cannonDebugger;
+  constructor(player: "boulder" | "car") {
     const { scene, world } = new SceneManager();
     this.scene = scene;
     this.world = world;
@@ -27,8 +30,10 @@ export default class Game {
     const { stars } = new StarField(10000);
     this.scene.add(stars);
     this.loader = new GLTFLoader();
-    this.initBoulder();
+    player === "boulder" ? this.initBoulder() : this.initCar();
     this.initGrond();
+
+    // this.cannonDebugger = CannonDebugger(scene, world);
   }
 
   async initBoulder() {
@@ -37,7 +42,18 @@ export default class Game {
     );
     this.player3dModel = playerModel.scene;
     this.player3dModel.scale.set(1, 1, 1);
-    const player = new Player(this.player3dModel);
+    const player = new BoulderPlayer(this.player3dModel);
+    this.player = player;
+    this.scene.add(player.playerMesh);
+    this.scene.add(player.camera);
+    this.world.addBody(player.playerBody);
+  }
+
+  async initCar() {
+    const playerModel = await this.loader.loadAsync("/models/car.glb");
+    this.player3dModel = playerModel.scene;
+    this.player3dModel.scale.set(0.3, 0.3, 0.3);
+    const player = new Car(this.player3dModel);
     this.player = player;
     this.scene.add(player.playerMesh);
     this.scene.add(player.camera);
@@ -84,6 +100,7 @@ export default class Game {
         this.world.step(1 / 120);
         this.player.move();
         this.player.update();
+        // this.cannonDebugger.update(); // call every frame
       }
     });
   }

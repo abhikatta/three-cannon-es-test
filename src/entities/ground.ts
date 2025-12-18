@@ -16,7 +16,7 @@ export default class Ground {
       type: Body.STATIC,
       material: new Material(),
     });
-    groundBody.position.set(0, 0, 0);
+    groundBody.position.set(-size.z / 2, -0.5, -size.x / 2);
     world.addBody(groundBody);
 
     for (let x = -tilesX / 2; x < tilesX / 2; x++) {

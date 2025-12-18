@@ -2,7 +2,7 @@ import { Body, Material, Sphere, Vec3 } from "cannon-es";
 import { Object3D } from "three";
 import { PlayerBase } from "./player-base";
 
-export default class Player extends PlayerBase {
+export default class BoulderPlayer extends PlayerBase {
   constructor(player3dModel: Object3D) {
     super(player3dModel);
     this.playerMesh = player3dModel;
