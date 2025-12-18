@@ -37,8 +37,6 @@ export abstract class PlayerBase {
   update() {
     this.playerMesh.position.copy(this.playerBody.position);
     this.playerMesh.quaternion.copy(this.playerBody.quaternion);
-    this.playerMesh.position.copy(this.playerBody.position);
-    this.playerMesh.quaternion.copy(this.playerBody.quaternion);
 
     // from (-3,2,0) looking at (1,0,0) so its like from behind top looking at front down
     this.camera.lookAt(

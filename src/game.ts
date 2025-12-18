@@ -7,18 +7,18 @@ import { GLTFLoader, OrbitControls } from "three/examples/jsm/Addons.js";
 import BoulderPlayer from "@/entities/boulder-player";
 import { PlayerBase } from "./entities/player-base";
 import { Car } from "./entities/car-player";
-// import CannonDebugger from "cannon-es-debugger";
+import CannonDebugger from "cannon-es-debugger";
 export default class Game {
   renderer;
   scene;
   world;
   player!: PlayerBase;
-  orbitalCamera: PerspectiveCamera | null = null;
+  orbitalCamera!: PerspectiveCamera;
   orbitalControls: OrbitControls | null = null;
   player3dModel!: Object3D;
   ground3dModel!: Object3D;
   loader;
-  //   cannonDebugger;
+  cannonDebugger: ReturnType<typeof CannonDebugger> | null = null;
   constructor(player: "boulder" | "car") {
     const { scene, world } = new SceneManager();
     this.scene = scene;
@@ -32,7 +32,7 @@ export default class Game {
     this.loader = new GLTFLoader();
     player === "boulder" ? this.initBoulder() : this.initCar();
     this.initGrond();
-
+    // this.orbitalCameraInit();
     // this.cannonDebugger = CannonDebugger(scene, world);
   }
 
@@ -65,6 +65,21 @@ export default class Game {
     this.ground3dModel = groundModel.scene;
 
     new Ground(this.ground3dModel, this.scene, this.world);
+  }
+
+  orbitalCameraInit() {
+    this.orbitalCamera = new PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
+    this.orbitalCamera.position.set(0, 10, 0);
+    this.orbitalControls = new OrbitControls(
+      this.orbitalCamera,
+      this.renderer.domElement
+    );
+    this.scene.add(this.orbitalCamera);
   }
 
   /*
@@ -100,7 +115,8 @@ export default class Game {
         this.world.step(1 / 120);
         this.player.move();
         this.player.update();
-        // this.cannonDebugger.update(); // call every frame
+        this.cannonDebugger?.update();
+        // this.orbitalControls?.update();
       }
     });
   }
