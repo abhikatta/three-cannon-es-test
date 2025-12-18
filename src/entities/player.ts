@@ -31,6 +31,11 @@ export default class Player {
     );
 
     this.InputManager = new InputManager();
+
+    // TODO: add a rolling boulder sound later
+    // const audioFilePath = "my_sound.wav";
+    // this.audio = new Audio(audioFilePath);
+
     this.update();
   }
 
@@ -38,6 +43,7 @@ export default class Player {
     this.playerMesh.position.copy(this.playerBody.position);
     this.playerMesh.quaternion.copy(this.playerBody.quaternion);
 
+    // from (-3,2,0) looking at (1,0,0) so its like from behind top looking at front down
     this.camera.lookAt(
       this.playerMesh.position.x + 1,
       this.playerMesh.position.y,
@@ -66,6 +72,15 @@ export default class Player {
     // only apply this force when player is flying
     // if (!this.InputManager.isDown("Space"))
     //   this.playerBody.applyForce(new Vec3(0, -200, 0));
+
+    // TODO: fix this - play the sound if the boulding is actually moving
+    // if (
+    //   this.playerBody.torque.x !== 0 ||
+    //   this.playerBody.torque.y !== 0 ||
+    //   this.playerBody.torque.z !== 0
+    // ) {
+    //   this.audio.play();
+    // }
 
     this.playerBody.torque.vadd(force, this.playerBody.torque);
     this.playerBody.angularFactor.set(1, 1, 1);

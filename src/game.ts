@@ -23,11 +23,6 @@ export default class Game {
     const { renderer } = new RenderManager();
     this.renderer = renderer;
 
-    const { groundBody, groundMesh } = new Ground();
-
-    this.scene.add(groundMesh);
-    this.world.addBody(groundBody);
-
     const { stars } = new StarField(10000);
     this.scene.add(stars);
     this.init();
@@ -40,10 +35,17 @@ export default class Game {
     this.player3dModel.scale.set(1, 1, 1);
     const player = new Player(this.player3dModel);
     this.player = player;
-
     this.scene.add(player.playerMesh);
     this.scene.add(player.camera);
     this.world.addBody(player.playerBody);
+
+    const groundModel = await loader.loadAsync("/models/stone_ground.glb");
+    this.ground3dModel = groundModel.scene;
+
+    const { groundBody, groundMesh } = new Ground(this.ground3dModel);
+
+    this.scene.add(groundMesh);
+    this.world.addBody(groundBody);
   }
 
   /*
