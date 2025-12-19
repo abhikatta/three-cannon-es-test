@@ -8,6 +8,8 @@ import BoulderPlayer from "@/entities/boulder-player";
 import { PlayerBase } from "./entities/player-base";
 import { Car } from "./entities/car-player";
 import CannonDebugger from "cannon-es-debugger";
+import { Vec3 } from "cannon-es";
+
 export default class Game {
   renderer;
   scene;
@@ -20,7 +22,9 @@ export default class Game {
   loader;
   cannonDebugger: ReturnType<typeof CannonDebugger> | null = null;
   constructor(player: "boulder" | "car") {
-    const { scene, world } = new SceneManager();
+    const gravity =
+      player === "boulder" ? new Vec3(0, -9.81, 0) : new Vec3(0, 0, 0);
+    const { scene, world } = new SceneManager(gravity);
     this.scene = scene;
     this.world = world;
 
@@ -32,7 +36,7 @@ export default class Game {
     this.loader = new GLTFLoader();
     player === "boulder" ? this.initBoulder() : this.initCar();
     this.initGrond();
-    this.orbitalCameraInit();
+    this.initOrbitalCamera();
     this.cannonDebugger = CannonDebugger(scene, world);
   }
 
@@ -41,7 +45,6 @@ export default class Game {
       "/models/free_stone_sphere.glb"
     );
     this.player3dModel = playerModel.scene;
-    this.player3dModel.scale.set(1, 1, 1);
     const player = new BoulderPlayer(this.player3dModel);
     this.player = player;
     this.scene.add(player.playerMesh);
@@ -66,7 +69,7 @@ export default class Game {
     new Ground(this.ground3dModel, this.scene, this.world);
   }
 
-  orbitalCameraInit() {
+  initOrbitalCamera() {
     this.orbitalCamera = new PerspectiveCamera(
       75,
       window.innerWidth / window.innerHeight,
@@ -110,7 +113,11 @@ export default class Game {
   start() {
     this.renderer.setAnimationLoop(() => {
       if (this.player) {
-        this.renderer.render(this.scene, this.player.camera);
+        this.renderer.render(
+          this.scene,
+          //   this.orbitalCamera
+          this.player.camera
+        );
         this.world.step(1 / 120);
         this.player.move();
         this.player.update();

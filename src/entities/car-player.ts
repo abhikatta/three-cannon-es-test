@@ -23,6 +23,9 @@ export class Car extends PlayerBase {
       mass: 1,
       material: new Material(),
     });
+    this.playerBody.fixedRotation = true;
+    this.playerBody.linearDamping = 0.5;
+    this.playerBody.updateMassProperties();
   }
   move() {
     super.move();
@@ -47,6 +50,14 @@ export class Car extends PlayerBase {
       this.force.x += this.speed;
       sideTiltTarget = -maxTilt;
     }
+    if (this.InputManager.isDown("KeyQ")) {
+      this.force.y += this.speed;
+      this.playerBody.torque.setZero();
+    }
+    if (this.InputManager.isDown("KeyE")) {
+      this.force.y -= this.speed;
+      this.playerBody.torque.setZero();
+    }
     // reset lateraltilt to straight if not going forward or backward
     if (
       !this.InputManager.isDown("KeyW") &&
@@ -69,22 +80,20 @@ export class Car extends PlayerBase {
       (lateralTiltTarget - this.lateralTiltAngle) * tiltSpeed;
 
     this.playerBody.applyForce(this.force);
-    this.playerBody.fixedRotation = true;
-    this.playerBody.linearDamping = 0.4;
   }
   update() {
     this.camera.lookAt(
       this.playerBody.position.x,
-      this.playerBody.position.y,
-      this.playerBody.position.z - 15
+      this.playerBody.position.y + 1,
+      this.playerBody.position.z - 1
     );
     this.playerMesh.quaternion.copy(this.playerBody.quaternion);
 
     this.camera.position.copy(
       new Vec3(
         this.playerBody.position.x,
-        this.playerBody.position.y + 10,
-        this.playerBody.position.z + 12
+        this.playerBody.position.y + 7,
+        this.playerBody.position.z + 9
       )
     );
 

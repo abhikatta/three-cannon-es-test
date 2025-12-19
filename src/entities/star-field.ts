@@ -16,7 +16,7 @@ export default class StarField {
 
     for (let i = 0; i <= count; i++) {
       const x = MathUtils.randFloatSpread(spread);
-      const y = MathUtils.randFloatSpread(spread) + spread / 2; // to make them stay above ground
+      const y = MathUtils.randFloatSpread(spread);
       const z = MathUtils.randFloatSpread(spread);
       matrix.setPosition(x, y, z);
       this.stars.setMatrixAt(i, matrix);
