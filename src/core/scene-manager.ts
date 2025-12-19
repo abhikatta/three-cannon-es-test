@@ -11,7 +11,7 @@ export default class SceneManager {
     this.scene.add(sun);
     this.scene.add(sun.target);
     this.world = new World({
-      gravity: new Vec3(0, -9.81, 0),
+      gravity: new Vec3(0, 0, 0),
     });
   }
 }
