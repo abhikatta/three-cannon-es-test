@@ -7,8 +7,7 @@ export default class BoulderPlayer extends PlayerBase {
     super(player3dModel);
     this.playerMesh = player3dModel;
 
-    const radius =
-      Math.max(
+    const radius =Math.max(
         this.playerModelSize.x,
         this.playerModelSize.y,
         this.playerModelSize.z

@@ -32,8 +32,8 @@ export default class Game {
     this.loader = new GLTFLoader();
     player === "boulder" ? this.initBoulder() : this.initCar();
     this.initGrond();
-    // this.orbitalCameraInit();
-    // this.cannonDebugger = CannonDebugger(scene, world);
+    this.orbitalCameraInit();
+    this.cannonDebugger = CannonDebugger(scene, world);
   }
 
   async initBoulder() {
@@ -111,12 +111,12 @@ export default class Game {
   start() {
     this.renderer.setAnimationLoop(() => {
       if (this.player) {
-        this.renderer.render(this.scene, this.player.camera);
+        this.renderer.render(this.scene, this.orbitalCamera);
         this.world.step(1 / 120);
         this.player.move();
         this.player.update();
         this.cannonDebugger?.update();
-        // this.orbitalControls?.update();
+        this.orbitalControls?.update();
       }
     });
   }

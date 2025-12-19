@@ -19,12 +19,13 @@ export class Car extends PlayerBase {
       material: new Material(),
     });
   }
-  move(): void {}
+  move(): void {
+    super.move();
+  }
   update(): void {
     this.playerMesh.position.copy(
-      new Vec3(0, this.playerBody.position.y - 0.5, 0)
+      new Vec3(0, this.playerBody.position.y - 0.6, 0)
     );
-    console.log(this.playerBody.quaternion.z);
     this.playerMesh.quaternion.copy(
       new Quaternion(
         this.playerBody.quaternion.x,
