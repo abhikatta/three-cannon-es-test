@@ -1,4 +1,4 @@
-import { Body, Cylinder, Material, Quaternion, Vec3 } from "cannon-es";
+import { Body, Box, Material, Vec3 } from "cannon-es";
 import { Object3D } from "three";
 import { PlayerBase } from "./player-base";
 
@@ -6,51 +6,44 @@ export class Car extends PlayerBase {
   constructor(player3dModel: Object3D) {
     super(player3dModel);
     this.playerMesh = player3dModel;
+
     this.playerBody = new Body({
-      shape: new Cylinder(
-        this.playerModelSize.y / 2,
-        this.playerModelSize.y,
-        this.playerModelSize.x,
-        6
+      shape: new Box(
+        new Vec3(
+          this.playerModelSize.x / 2,
+          this.playerModelSize.y / 2,
+          this.playerModelSize.z / 2
+        )
       ),
-      position: new Vec3(0.5, 0.25, 0),
-      quaternion: new Quaternion(0, 0, 1),
+      position: new Vec3(0, 2, 0),
       mass: 1,
       material: new Material(),
     });
   }
-  move(): void {
+  move() {
     super.move();
   }
-  update(): void {
+  update() {
     this.playerMesh.position.copy(
-      new Vec3(0, this.playerBody.position.y - 0.6, 0)
-    );
-    this.playerMesh.quaternion.copy(
-      new Quaternion(
-        this.playerBody.quaternion.x,
-        this.playerBody.quaternion.y,
-        this.playerBody.quaternion.z - 0.7
-      )
-    );
-    this.camera.lookAt(
-      this.playerMesh.position.x + 1,
-      this.playerMesh.position.y,
-      this.playerMesh.position.z
-    );
-    this.camera.position.copy(
       new Vec3(
-        this.playerMesh.position.x - 3,
-        this.playerMesh.position.y + 2,
-        this.playerMesh.position.z
+        this.playerBody.position.x - 1.5,
+        this.playerBody.position.y - 2,
+        this.playerBody.position.z
       )
     );
-    // this.camera.position.copy(
-    //   new Vec3(
-    //     this.playerMesh.position.x - 4,
-    //     this.playerMesh.position.y + 2,
-    //     this.playerMesh.position.z
-    //   )
+
+    this.playerMesh.quaternion.copy(this.playerBody.quaternion);
+
+    // this.camera.lookAt(
+    //   this.playerMesh.position.x,
+    //   this.playerMesh.position.y,
+    //   this.playerMesh.position.z
+    // );
+
+    // this.camera.position.set(
+    //   this.playerMesh.position.x - 3,
+    //   this.playerMesh.position.y + 2,
+    //   this.playerMesh.position.z
     // );
   }
 }

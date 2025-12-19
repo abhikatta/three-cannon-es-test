@@ -52,7 +52,6 @@ export default class Game {
   async initCar() {
     const playerModel = await this.loader.loadAsync("/models/car.glb");
     this.player3dModel = playerModel.scene;
-    this.player3dModel.scale.set(0.3, 0.3, 0.3);
     const player = new Car(this.player3dModel);
     this.player = player;
     this.scene.add(player.playerMesh);
