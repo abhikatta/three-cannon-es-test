@@ -1,10 +1,14 @@
 import { Body, Box, Material, Quaternion, Vec3 } from "cannon-es";
-import { Object3D } from "three";
+import { Euler, Object3D, Quaternion as ThreeQuaternion } from "three";
 import { PlayerBase } from "./player-base";
 
 export class Car extends PlayerBase {
+  sideTiltAngle; // left and right
+  lateralTiltAngle; // forward and backward
   constructor(player3dModel: Object3D) {
     super(player3dModel);
+    this.sideTiltAngle = 0; // radians
+    this.lateralTiltAngle = 0; // radians
     this.playerMesh = player3dModel;
     this.playerBody = new Body({
       shape: new Box(
@@ -22,28 +26,51 @@ export class Car extends PlayerBase {
   }
   move() {
     super.move();
+
+    let sideTiltTarget = 0;
+    let lateralTiltTarget = 0;
+
+    const maxTilt = 0.2;
     if (this.InputManager.isDown("KeyW")) {
       this.force.z -= this.speed;
-      this.playerMesh.rotateZ(Math.PI / 4);
+      lateralTiltTarget = maxTilt;
     }
     if (this.InputManager.isDown("KeyS")) {
       this.force.z += this.speed;
-      this.playerMesh.rotateZ(Math.PI / 4);
+      lateralTiltTarget = -maxTilt;
     }
     if (this.InputManager.isDown("KeyA")) {
       this.force.x -= this.speed;
-      this.playerMesh.rotateZ(Math.PI / 4);
+      sideTiltTarget = maxTilt;
     }
     if (this.InputManager.isDown("KeyD")) {
       this.force.x += this.speed;
-      this.playerMesh.rotateZ(Math.PI / 4);
+      sideTiltTarget = -maxTilt;
     }
+    // reset lateraltilt to straight if not going forward or backward
+    if (
+      !this.InputManager.isDown("KeyW") &&
+      !this.InputManager.isDown("KeyS")
+    ) {
+      lateralTiltTarget = 0;
+    }
+    // reset sidetilt to straight if not going left or right
+    if (
+      !this.InputManager.isDown("KeyA") &&
+      !this.InputManager.isDown("KeyD")
+    ) {
+      sideTiltTarget = 0;
+    }
+
+    const tiltSpeed = 0.1;
+    // per frame update the tilt angle
+    this.sideTiltAngle += (sideTiltTarget - this.sideTiltAngle) * tiltSpeed;
+    this.lateralTiltAngle +=
+      (lateralTiltTarget - this.lateralTiltAngle) * tiltSpeed;
 
     this.playerBody.applyForce(this.force);
     this.playerBody.fixedRotation = true;
     this.playerBody.linearDamping = 0.4;
-
-    this.update();
   }
   update() {
     this.camera.lookAt(
@@ -68,5 +95,12 @@ export class Car extends PlayerBase {
         this.playerBody.position.z - 1.5
       )
     );
+
+    // per frame set the updated tilt angle
+    const tiltQuat = new ThreeQuaternion();
+    tiltQuat.setFromEuler(
+      new Euler(this.sideTiltAngle, 0, this.lateralTiltAngle)
+    );
+    this.playerMesh.quaternion.multiply(tiltQuat);
   }
 }

@@ -24,8 +24,6 @@ export default class BoulderPlayer extends PlayerBase {
     // TODO: add a rolling boulder sound later
     // const audioFilePath = "my_sound.wav";
     // this.audio = new Audio(audioFilePath);
-
-    this.update();
   }
 
   move() {
@@ -54,7 +52,5 @@ export default class BoulderPlayer extends PlayerBase {
     this.playerBody.angularFactor.set(1, 1, 1);
     this.playerBody.angularDamping = 0.5;
     this.playerBody.linearDamping = 0.2;
-
-    this.update();
   }
 }
