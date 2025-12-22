@@ -37,9 +37,12 @@ export default class Game {
     player === "boulder" ? this.initBoulder() : this.initCar();
     this.initGrond();
     this.initOrbitalCamera();
-    this.cannonDebugger = CannonDebugger(scene, world);
+    // this.cannonDebugger = CannonDebugger(scene, world);
+    const gl = renderer.getContext();
+    const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
+    if (debugInfo?.UNMASKED_RENDERER_WEBGL)
+      console.log(gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL));
   }
-
   async initBoulder() {
     const playerModel = await this.loader.loadAsync(
       "/models/free_stone_sphere.glb"

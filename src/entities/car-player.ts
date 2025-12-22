@@ -26,6 +26,10 @@ export class Car extends PlayerBase {
     this.playerBody.fixedRotation = true;
     this.playerBody.linearDamping = 0.5;
     this.playerBody.updateMassProperties();
+
+    // Adjust camera for car
+    this.cameraPitch = 0.5;
+    this.cameraDistance = 15;
   }
   move() {
     super.move();
@@ -82,20 +86,37 @@ export class Car extends PlayerBase {
     this.playerBody.applyForce(this.force);
   }
   update() {
+    // Update camera angles based on mouse movement
+    const mouseDelta = this.InputManager.getMouseDelta();
+    this.cameraYaw -= mouseDelta.x;
+    this.cameraPitch = Math.max(
+      -Math.PI / 2,
+      Math.min(Math.PI / 2, this.cameraPitch - mouseDelta.y)
+    );
+
+    // Calculate camera position based on angles
+    const cameraX =
+      this.playerBody.position.x +
+      this.cameraDistance *
+        Math.sin(this.cameraYaw) *
+        Math.cos(this.cameraPitch);
+    const cameraY =
+      this.playerBody.position.y +
+      this.cameraDistance * Math.sin(this.cameraPitch);
+    const cameraZ =
+      this.playerBody.position.z +
+      this.cameraDistance *
+        Math.cos(this.cameraYaw) *
+        Math.cos(this.cameraPitch);
+
+    this.camera.position.set(cameraX, cameraY, cameraZ);
     this.camera.lookAt(
       this.playerBody.position.x,
       this.playerBody.position.y + 1,
       this.playerBody.position.z - 1
     );
-    this.playerMesh.quaternion.copy(this.playerBody.quaternion);
 
-    this.camera.position.copy(
-      new Vec3(
-        this.playerBody.position.x,
-        this.playerBody.position.y + 7,
-        this.playerBody.position.z + 9
-      )
-    );
+    this.playerMesh.quaternion.copy(this.playerBody.quaternion);
 
     this.playerMesh.position.copy(
       new Vec3(
