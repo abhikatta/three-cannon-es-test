@@ -1,16 +1,17 @@
 import { Body, Box, Material, Quaternion, Vec3 } from "cannon-es";
-import { Euler, Object3D, Quaternion as ThreeQuaternion } from "three";
+import { Box3, Euler, Quaternion as ThreeQuaternion } from "three";
 import { PlayerBase } from "./player-base";
-import InputManager from "@/core/input-manager";
 
 export class Car extends PlayerBase {
-  sideTiltAngle; // left and right
-  lateralTiltAngle; // forward and backward
-  constructor(player3dModel: Object3D, inputManager: InputManager) {
-    super(player3dModel, inputManager);
-    this.sideTiltAngle = 0; // radians
-    this.lateralTiltAngle = 0; // radians
-    this.playerMesh = player3dModel;
+  sideTiltAngle = 0; // left and right // radians
+  lateralTiltAngle = 0; // forward and backward // radians
+
+  async init() {
+    const player3dModel = await this.loader.loadAsync("/models/car.glb");
+    this.playerMesh = player3dModel.scene;
+    this.playerModelBox = new Box3().setFromObject(this.playerMesh);
+    this.playerModelBox.getSize(this.playerModelSize);
+
     this.playerBody = new Body({
       shape: new Box(
         new Vec3(
@@ -27,6 +28,8 @@ export class Car extends PlayerBase {
     this.playerBody.fixedRotation = true;
     this.playerBody.linearDamping = 0.5;
     this.playerBody.updateMassProperties();
+    this.scene.add(this.playerMesh);
+    this.world.addBody(this.playerBody);
   }
   move() {
     super.move();

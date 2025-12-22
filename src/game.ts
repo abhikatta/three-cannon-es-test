@@ -38,43 +38,23 @@ export default class Game {
 
     const { stars } = new StarField(10000);
     this.scene.add(stars);
+
     this.loader = new GLTFLoader();
-    player === "boulder" ? this.initBoulder() : this.initCar();
-    this.initGrond();
+    const ground = new Ground();
+    ground.init(this.loader, this.scene, this.world);
+    const NewPlayer = player === "boulder" ? BoulderPlayer : Car;
+    this.player = new NewPlayer({
+      loader: this.loader,
+      inputManager: this.inputManager,
+      scene: this.scene,
+      world: this.world,
+    });
+
     // this.initOrbitalCamera();
     // this.cannonDebugger = CannonDebugger(scene, world);
     this.stats = new Stats();
     this.stats.showPanel(0);
     document.body.appendChild(this.stats.dom);
-  }
-
-  async initBoulder() {
-    const playerModel = await this.loader.loadAsync(
-      "/models/free_stone_sphere.glb"
-    );
-    this.player3dModel = playerModel.scene;
-    const player = new BoulderPlayer(this.player3dModel, this.inputManager);
-    this.player = player;
-    this.scene.add(player.playerMesh);
-    this.scene.add(player.camera);
-    this.world.addBody(player.playerBody);
-  }
-
-  async initCar() {
-    const playerModel = await this.loader.loadAsync("/models/car.glb");
-    this.player3dModel = playerModel.scene;
-    const player = new Car(this.player3dModel, this.inputManager);
-    this.player = player;
-    this.scene.add(player.playerMesh);
-    this.scene.add(player.camera);
-    this.world.addBody(player.playerBody);
-  }
-
-  async initGrond() {
-    const groundModel = await this.loader.loadAsync("/models/stone_ground.glb");
-    this.ground3dModel = groundModel.scene;
-
-    new Ground(this.ground3dModel, this.scene, this.world);
   }
 
   initOrbitalCamera() {
@@ -118,7 +98,8 @@ export default class Game {
     - The animation loop keeps the correct context and everything updates.
 */
 
-  start() {
+  async start() {
+    await this.player.init();
     this.renderer.setAnimationLoop(() => {
       if (this.player) {
         this.stats.begin();
