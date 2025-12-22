@@ -1,11 +1,10 @@
 import { Body, Material, Sphere, Vec3 } from "cannon-es";
 import { Object3D } from "three";
 import { PlayerBase } from "./player-base";
-import InputManager from "@/core/input-manager";
 
 export default class BoulderPlayer extends PlayerBase {
-  constructor(player3dModel: Object3D, inputManager: InputManager) {
-    super(player3dModel, inputManager);
+  constructor(player3dModel: Object3D) {
+    super(player3dModel);
     this.playerMesh = player3dModel;
 
     const radius =
@@ -29,15 +28,15 @@ export default class BoulderPlayer extends PlayerBase {
 
   move() {
     super.move();
-    if (this.inputManager.isDown("KeyW")) this.force.z -= this.speed;
-    if (this.inputManager.isDown("KeyS")) this.force.z += this.speed;
-    if (this.inputManager.isDown("KeyA")) this.force.x -= this.speed;
-    if (this.inputManager.isDown("KeyD")) this.force.x += this.speed;
-    if (this.inputManager.isDown("Space")) this.force.y += this.speed;
+    if (this.InputManager.isDown("KeyW")) this.force.z -= this.speed;
+    if (this.InputManager.isDown("KeyS")) this.force.z += this.speed;
+    if (this.InputManager.isDown("KeyA")) this.force.x -= this.speed;
+    if (this.InputManager.isDown("KeyD")) this.force.x += this.speed;
+    if (this.InputManager.isDown("Space")) this.force.y += this.speed;
 
     // TODO: add a state that if player is on ground then dont apply this state
     // only apply this force when player is flying
-    // if (!this.inputManager.isDown("Space"))
+    // if (!this.InputManager.isDown("Space"))
     //   this.playerBody.applyForce(new Vec3(0, -200, 0));
 
     // TODO: fix this - play the sound if the boulder is actually moving

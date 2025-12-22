@@ -1,13 +1,12 @@
 import { Body, Box, Material, Quaternion, Vec3 } from "cannon-es";
 import { Euler, Object3D, Quaternion as ThreeQuaternion } from "three";
 import { PlayerBase } from "./player-base";
-import InputManager from "@/core/input-manager";
 
 export class Car extends PlayerBase {
   sideTiltAngle; // left and right
   lateralTiltAngle; // forward and backward
-  constructor(player3dModel: Object3D, inputManager: InputManager) {
-    super(player3dModel, inputManager);
+  constructor(player3dModel: Object3D) {
+    super(player3dModel);
     this.sideTiltAngle = 0; // radians
     this.lateralTiltAngle = 0; // radians
     this.playerMesh = player3dModel;
@@ -35,41 +34,41 @@ export class Car extends PlayerBase {
     let lateralTiltTarget = 0;
 
     const maxTilt = 0.2;
-    if (this.inputManager.isDown("KeyW")) {
+    if (this.InputManager.isDown("KeyW")) {
       this.force.z -= this.speed;
       lateralTiltTarget = maxTilt;
     }
-    if (this.inputManager.isDown("KeyS")) {
+    if (this.InputManager.isDown("KeyS")) {
       this.force.z += this.speed;
       lateralTiltTarget = -maxTilt;
     }
-    if (this.inputManager.isDown("KeyA")) {
+    if (this.InputManager.isDown("KeyA")) {
       this.force.x -= this.speed;
       sideTiltTarget = maxTilt;
     }
-    if (this.inputManager.isDown("KeyD")) {
+    if (this.InputManager.isDown("KeyD")) {
       this.force.x += this.speed;
       sideTiltTarget = -maxTilt;
     }
-    if (this.inputManager.isDown("KeyQ")) {
+    if (this.InputManager.isDown("KeyQ")) {
       this.force.y += this.speed;
       this.playerBody.torque.setZero();
     }
-    if (this.inputManager.isDown("KeyE")) {
+    if (this.InputManager.isDown("KeyE")) {
       this.force.y -= this.speed;
       this.playerBody.torque.setZero();
     }
     // reset lateraltilt to straight if not going forward or backward
     if (
-      !this.inputManager.isDown("KeyW") &&
-      !this.inputManager.isDown("KeyS")
+      !this.InputManager.isDown("KeyW") &&
+      !this.InputManager.isDown("KeyS")
     ) {
       lateralTiltTarget = 0;
     }
     // reset sidetilt to straight if not going left or right
     if (
-      !this.inputManager.isDown("KeyA") &&
-      !this.inputManager.isDown("KeyD")
+      !this.InputManager.isDown("KeyA") &&
+      !this.InputManager.isDown("KeyD")
     ) {
       sideTiltTarget = 0;
     }
