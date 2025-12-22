@@ -38,9 +38,13 @@ export default class Game {
 
     const { stars } = new StarField(10000);
     this.scene.add(stars);
+
     this.loader = new GLTFLoader();
+    const ground = new Ground();
+    ground.init(this.loader, this.scene, this.world);
+
     player === "boulder" ? this.initBoulder() : this.initCar();
-    this.initGrond();
+
     // this.initOrbitalCamera();
     // this.cannonDebugger = CannonDebugger(scene, world);
     this.stats = new Stats();
@@ -68,13 +72,6 @@ export default class Game {
     this.scene.add(player.playerMesh);
     this.scene.add(player.camera);
     this.world.addBody(player.playerBody);
-  }
-
-  async initGrond() {
-    const groundModel = await this.loader.loadAsync("/models/stone_ground.glb");
-    this.ground3dModel = groundModel.scene;
-
-    new Ground(this.ground3dModel, this.scene, this.world);
   }
 
   initOrbitalCamera() {

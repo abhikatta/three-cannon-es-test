@@ -1,17 +1,30 @@
 import { Body, Box, Material, Vec3, World } from "cannon-es";
-import { Box3, Object3D, Scene, Vector3 } from "three";
+import { Box3, Scene, Vector3 } from "three";
+import { GLTFLoader } from "three/examples/jsm/Addons.js";
 
 export default class Ground {
-  constructor(ground3dModel: Object3D, scene: Scene, world: World) {
-    const tilesX = 10;
-    const tilesZ = 10;
-    const box = new Box3().setFromObject(ground3dModel);
+  tilesX;
+  tilesZ;
+
+  constructor() {
+    this.tilesX = 10;
+    this.tilesZ = 10;
+  }
+
+  async init(loader: GLTFLoader, scene: Scene, world: World) {
+    const groundModel = await loader.loadAsync("/models/stone_ground.glb");
+
     const size = new Vector3();
+    const box = new Box3().setFromObject(groundModel.scene);
     box.getSize(size);
 
     const groundBody = new Body({
       shape: new Box(
-        new Vec3((size.x / 2) * tilesX, size.y / 2, (size.z / 2) * tilesZ)
+        new Vec3(
+          (size.x / 2) * this.tilesX,
+          size.y / 2,
+          (size.z / 2) * this.tilesZ
+        )
       ),
       type: Body.STATIC,
       material: new Material(),
@@ -19,9 +32,9 @@ export default class Ground {
     groundBody.position.set(-size.z / 2, -0.5, -size.x / 2);
     world.addBody(groundBody);
 
-    for (let x = -tilesX / 2; x < tilesX / 2; x++) {
-      for (let z = -tilesZ / 2; z < tilesZ / 2; z++) {
-        const tile = ground3dModel.clone(true);
+    for (let x = -this.tilesX / 2; x < this.tilesX / 2; x++) {
+      for (let z = -this.tilesZ / 2; z < this.tilesZ / 2; z++) {
+        const tile = groundModel.scene.clone(true);
 
         tile.position.set(x * size.x, 0, z * size.z);
 
