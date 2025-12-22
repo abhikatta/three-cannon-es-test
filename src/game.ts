@@ -9,6 +9,7 @@ import { PlayerBase } from "./entities/player-base";
 import { Car } from "./entities/car-player";
 import CannonDebugger from "cannon-es-debugger";
 import { Vec3 } from "cannon-es";
+import InputManager from "./core/input-manager";
 import Stats from "three/examples/jsm/libs/stats.module.js";
 
 export default class Game {
@@ -22,8 +23,10 @@ export default class Game {
   ground3dModel!: Object3D;
   loader;
   cannonDebugger: ReturnType<typeof CannonDebugger> | null = null;
+  inputManager;
   stats;
   constructor(player: "boulder" | "car") {
+    this.inputManager = new InputManager();
     const gravity =
       player === "boulder" ? new Vec3(0, -9.81, 0) : new Vec3(0, 0, 0);
     const { scene, world } = new SceneManager(gravity);
@@ -50,7 +53,7 @@ export default class Game {
       "/models/free_stone_sphere.glb"
     );
     this.player3dModel = playerModel.scene;
-    const player = new BoulderPlayer(this.player3dModel);
+    const player = new BoulderPlayer(this.player3dModel, this.inputManager);
     this.player = player;
     this.scene.add(player.playerMesh);
     this.scene.add(player.camera);
@@ -60,7 +63,7 @@ export default class Game {
   async initCar() {
     const playerModel = await this.loader.loadAsync("/models/car.glb");
     this.player3dModel = playerModel.scene;
-    const player = new Car(this.player3dModel);
+    const player = new Car(this.player3dModel, this.inputManager);
     this.player = player;
     this.scene.add(player.playerMesh);
     this.scene.add(player.camera);
