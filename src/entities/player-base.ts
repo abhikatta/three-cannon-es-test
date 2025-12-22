@@ -6,12 +6,12 @@ export abstract class PlayerBase {
   playerMesh;
   playerBody!: Body;
   camera;
-  InputManager!: InputManager;
+  inputManager!: InputManager;
   force;
   speed;
   playerModelSize;
   playerModelBox;
-  constructor(player3dModel: Object3D) {
+  constructor(player3dModel: Object3D, inputManager: InputManager) {
     this.playerMesh = player3dModel;
     this.speed = 30;
     this.force = new Vec3(0, 0, 0);
@@ -27,7 +27,7 @@ export abstract class PlayerBase {
       1000
     );
 
-    this.InputManager = new InputManager();
+    this.inputManager = inputManager;
   }
 
   move() {
