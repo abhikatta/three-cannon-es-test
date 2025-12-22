@@ -9,6 +9,7 @@ import { PlayerBase } from "./entities/player-base";
 import { Car } from "./entities/car-player";
 import CannonDebugger from "cannon-es-debugger";
 import { Vec3 } from "cannon-es";
+import Stats from "three/examples/jsm/libs/stats.module.js";
 
 export default class Game {
   renderer;
@@ -21,6 +22,7 @@ export default class Game {
   ground3dModel!: Object3D;
   loader;
   cannonDebugger: ReturnType<typeof CannonDebugger> | null = null;
+  stats;
   constructor(player: "boulder" | "car") {
     const gravity =
       player === "boulder" ? new Vec3(0, -9.81, 0) : new Vec3(0, 0, 0);
@@ -36,8 +38,11 @@ export default class Game {
     this.loader = new GLTFLoader();
     player === "boulder" ? this.initBoulder() : this.initCar();
     this.initGrond();
-    this.initOrbitalCamera();
-    this.cannonDebugger = CannonDebugger(scene, world);
+    // this.initOrbitalCamera();
+    // this.cannonDebugger = CannonDebugger(scene, world);
+    this.stats = new Stats();
+    this.stats.showPanel(0);
+    document.body.appendChild(this.stats.dom);
   }
 
   async initBoulder() {
@@ -113,6 +118,8 @@ export default class Game {
   start() {
     this.renderer.setAnimationLoop(() => {
       if (this.player) {
+        this.stats.begin();
+
         this.renderer.render(
           this.scene,
           //   this.orbitalCamera
@@ -121,8 +128,9 @@ export default class Game {
         this.world.step(1 / 120);
         this.player.move();
         this.player.update();
-        this.cannonDebugger?.update();
-        this.orbitalControls?.update();
+        // this.cannonDebugger?.update();
+        // this.orbitalControls?.update();
+        this.stats.end();
       }
     });
   }
