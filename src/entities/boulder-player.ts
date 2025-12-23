@@ -1,12 +1,15 @@
 import { Body, Material, Sphere, Vec3 } from "cannon-es";
-import { Object3D } from "three";
 import { PlayerBase } from "./player-base";
-import InputManager from "@/core/input-manager";
 
 export default class BoulderPlayer extends PlayerBase {
-  constructor(player3dModel: Object3D, inputManager: InputManager) {
-    super(player3dModel, inputManager);
-    this.playerMesh = player3dModel;
+  async init() {
+    const player3dModel = await this.loader.loadAsync(
+      "/models/free_stone_sphere.glb"
+    );
+    this.playerMesh = player3dModel.scene;
+
+    this.playerModelBox = this.playerModelBox.setFromObject(this.playerMesh);
+    this.playerModelBox.getSize(this.playerModelSize);
 
     const radius =
       Math.max(
@@ -21,7 +24,8 @@ export default class BoulderPlayer extends PlayerBase {
       mass: 1,
       material: new Material(),
     });
-
+    this.scene.add(this.playerMesh);
+    this.world.addBody(this.playerBody);
     // TODO: add a rolling boulder sound later
     // const audioFilePath = "my_sound.wav";
     // this.audio = new Audio(audioFilePath);

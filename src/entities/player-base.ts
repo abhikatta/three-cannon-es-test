@@ -1,24 +1,34 @@
 import InputManager from "@/core/input-manager";
-import { Body, Vec3 } from "cannon-es";
-import { Box3, Object3D, PerspectiveCamera, Vector3 } from "three";
+import { Body, Vec3, World } from "cannon-es";
+import { Box3, Object3D, PerspectiveCamera, Scene, Vector3 } from "three";
+import { GLTFLoader } from "three/examples/jsm/Addons.js";
+
+export interface InitPlayerProps {
+  inputManager: InputManager;
+  loader: GLTFLoader;
+  scene: Scene;
+  world: World;
+}
 
 export abstract class PlayerBase {
-  playerMesh;
+  playerMesh!: Object3D;
   playerBody!: Body;
   camera;
-  inputManager!: InputManager;
-  force;
-  speed;
-  playerModelSize;
-  playerModelBox;
-  constructor(player3dModel: Object3D, inputManager: InputManager) {
-    this.playerMesh = player3dModel;
-    this.speed = 30;
-    this.force = new Vec3(0, 0, 0);
-
-    this.playerModelBox = new Box3().setFromObject(this.playerMesh);
-    this.playerModelSize = new Vector3();
-    this.playerModelBox.getSize(this.playerModelSize);
+  force = new Vec3(0, 0, 0);
+  speed = 30;
+  inputManager;
+  loader;
+  scene;
+  world;
+  playerModelSize = new Vector3();
+  playerModelBox = new Box3();
+  constructor({ inputManager, loader, scene, world }: InitPlayerProps) {
+    // this.playerModelBox = new Box3().setFromObject(this.playerMesh);
+    //     this.playerModelSize = new Vector3();
+    //     this.playerModelBox.getSize(this.playerModelSize);
+    this.loader = loader;
+    this.scene = scene;
+    this.world = world;
 
     this.camera = new PerspectiveCamera(
       75,
@@ -29,6 +39,8 @@ export abstract class PlayerBase {
 
     this.inputManager = inputManager;
   }
+
+  abstract init(): Promise<void>;
 
   move() {
     this.force.set(0, 0, 0); //resetting force vector every frame else it would go to infinite
