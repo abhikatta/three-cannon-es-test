@@ -5,7 +5,7 @@ import { PlayerBase } from "./player-base";
 export class Car extends PlayerBase {
   sideTiltAngle = 0; // left and right // radians
   lateralTiltAngle = 0; // forward and backward // radians
-
+  cameraOffset = new Vec3(0, 7, 9);
   async init() {
     const player3dModel = await this.loader.loadAsync("/models/car.glb");
     this.playerMesh = player3dModel.scene;
@@ -25,8 +25,9 @@ export class Car extends PlayerBase {
       mass: 1,
       material: new Material(),
     });
-    this.playerBody.fixedRotation = true;
+    // this.playerBody.fixedRotation = true;
     this.playerBody.linearDamping = 0.5;
+    this.playerBody.angularDamping = 0.8;
     this.playerBody.updateMassProperties();
     this.scene.add(this.playerMesh);
     this.world.addBody(this.playerBody);
@@ -54,14 +55,23 @@ export class Car extends PlayerBase {
       this.force.x += this.speed;
       sideTiltTarget = -maxTilt;
     }
-    if (this.inputManager.isDown("KeyQ")) {
-      this.force.y += this.speed;
-      this.playerBody.torque.setZero();
+    if (this.inputManager.isDown("ArrowLeft")) {
+      this.playerBody.torque.y += this.speed * 4;
+      this.camera.setRotationFromQuaternion(new ThreeQuaternion());
     }
-    if (this.inputManager.isDown("KeyE")) {
-      this.force.y -= this.speed;
-      this.playerBody.torque.setZero();
+
+    if (this.inputManager.isDown("ArrowRight")) {
+      this.playerBody.torque.y -= this.speed * 4;
     }
+
+    // if (this.inputManager.isDown("ArrowUp")) {
+    //   this.force.y += this.speed;
+    //   this.playerBody.torque.setZero();
+    // }
+    // if (this.inputManager.isDown("ArrowDown")) {
+    //   this.force.y -= this.speed;
+    //   this.playerBody.torque.setZero();
+    // }
     // reset lateraltilt to straight if not going forward or backward
     if (
       !this.inputManager.isDown("KeyW") &&
@@ -93,13 +103,7 @@ export class Car extends PlayerBase {
     );
     this.playerMesh.quaternion.copy(this.playerBody.quaternion);
 
-    this.camera.position.copy(
-      new Vec3(
-        this.playerBody.position.x,
-        this.playerBody.position.y + 7,
-        this.playerBody.position.z + 9
-      )
-    );
+    this.camera.position.copy(this.playerBody.position).add(this.cameraOffset);
 
     this.playerMesh.position.copy(
       new Vec3(

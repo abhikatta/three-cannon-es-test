@@ -6,7 +6,7 @@ import Game from "./game";
 // });
 
 async function main() {
-  const game = new Game("boulder");
+  const game = new Game("car");
   await game.start();
 }
 
