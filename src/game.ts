@@ -11,6 +11,7 @@ import CannonDebugger from "cannon-es-debugger";
 import { Vec3 } from "cannon-es";
 import InputManager from "./core/input-manager";
 import Stats from "three/examples/jsm/libs/stats.module.js";
+import { ObstacleField } from "./entities/obstacle";
 
 export default class Game {
   renderer;
@@ -25,6 +26,7 @@ export default class Game {
   cannonDebugger: ReturnType<typeof CannonDebugger> | null = null;
   inputManager;
   stats;
+  obstaclesField;
   constructor(player: "boulder" | "car") {
     this.inputManager = new InputManager();
     const gravity =
@@ -39,6 +41,8 @@ export default class Game {
     const { stars } = new StarField(10000);
     this.scene.add(stars);
 
+    const obstaclesField = new ObstacleField(this.scene, this.world);
+    this.obstaclesField = obstaclesField;
     this.loader = new GLTFLoader();
     const ground = new Ground();
     ground.init(this.loader, this.scene, this.world);
@@ -50,8 +54,8 @@ export default class Game {
       world: this.world,
     });
 
-    // this.initOrbitalCamera();
-    // this.cannonDebugger = CannonDebugger(scene, world);
+    this.initOrbitalCamera();
+    this.cannonDebugger = CannonDebugger(scene, world);
     this.stats = new Stats();
     this.stats.showPanel(0);
     document.body.appendChild(this.stats.dom);
@@ -112,6 +116,8 @@ export default class Game {
         this.world.step(1 / 120);
         this.player.move();
         this.player.update();
+        this.obstaclesField.update();
+
         // this.cannonDebugger?.update();
         // this.orbitalControls?.update();
         this.stats.end();

@@ -2,6 +2,7 @@ import { Body, Box, Material, Vec3, World } from "cannon-es";
 import { Box3, Scene, Vector3 } from "three";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
 
+// TODO: find a way to generate it dynamically based on player's position
 export default class Ground {
   tilesX;
   tilesZ;

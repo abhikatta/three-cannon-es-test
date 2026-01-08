@@ -6,7 +6,9 @@ import Game from "./game";
 // });
 
 async function main() {
-  const game = new Game("car");
+  // TODO: Check how heavy the car model is
+  // and why the car model is heavier and renders in less FPS
+  const game = new Game("boulder");
   await game.start();
 }
 
